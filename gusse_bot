@@ -1,0 +1,69 @@
+import telebot
+import random
+from telebot import types
+bot = telebot.TeleBot('5357543510:AAG1dgIeMnL0hmNmPZfccjvjGVtpyq-KSEE')
+
+# Функция, обрабатывающая команду /start
+@bot.message_handler(commands=["start"])
+def start(messege):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("🎰 ХОЧУ ИГРАТЬ")
+    btn2 = types.KeyboardButton("🎟 ЗАГРУЗИТЬ ИГРУ")
+    markup.add(btn1, btn2)
+    bot.send_message(messege.chat.id, 'ЗДЕСЬ НАЧИНАЕТЬСЯ ПУТЬ НАСТРАДАМУСА\nВ ЭТОЙ ИГРЕ ТЫ МОЖЕШЬ ИСПЫТАТЬ СВОИ СИЛЫ', reply_markup=markup)
+
+@bot.message_handler(content_types=['text'])
+def func(message):
+    if(message.text == "🎰 ХОЧУ ИГРАТЬ"):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("НУ ЧТО ПОГНАЛИ НАХ**")
+        back = types.KeyboardButton("⬅️")
+        markup.add(btn1, back)
+        bot.send_message(message.chat.id, text="Привеет.. я хочу поиграть с тобой в игру 🤡",reply_markup=markup)
+    elif(message.text == "🎟 ЗАГРУЗИТЬ ИГРУ"):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("Блок Загрузки ")
+        back = types.KeyboardButton("⬅️")
+        markup.add(btn1, back)
+        bot.send_message(message.chat.id, text="Данное блок не работает, можно вернуться назад", reply_markup=markup)
+
+    elif (message.text == "⬅️"):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button1 = types.KeyboardButton("🎰 ХОЧУ ИГРАТЬ")
+        button2 = types.KeyboardButton("🎟 ЗАГРУЗИТЬ ИГРУ")
+        markup.add(button1, button2)
+        bot.send_message(message.chat.id, text="Вы вернулись в ЗАД\nМОЖЕМ ПОИГРАТЬ 🤡", reply_markup=markup)
+
+    elif (message.text == "НУ ЧТО ПОГНАЛИ НАХ**"):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton("Сохранить 💾")
+        back = types.KeyboardButton("⬅️")
+        markup.add(btn1, back)
+        bot.send_message(message.chat.id, text="Я загадал число от 1 до 100, попробуй угадать его!!!\nНе бойся я буду подсказывать👹", reply_markup=markup)
+        sent = bot.send_message(message.chat.id, 'введите число')
+        bot.register_next_step_handler(sent, game_mod)
+
+    else:
+        bot.send_message(message.chat.id, text="На такую комманду я не запрограммировал..")
+
+
+ran = random.randint(1, 101)
+@bot.message_handler(content_types=['text'])
+def game_mod(m):
+    numb= m.text
+    number = int(numb)
+    if number > ran:
+        bot.send_message(m.chat.id, text="число меньше, чем вы написали")
+        sent = bot.send_message(m.chat.id, 'введите число')
+        bot.register_next_step_handler(sent, game_mod)
+    elif number < ran:
+        bot.send_message(m.chat.id, text="число больше, чем вы написали")
+        sent = bot.send_message(m.chat.id, 'введите число')
+        bot.register_next_step_handler(sent, game_mod)
+    elif number == ran:
+        sent = bot.send_message(m.chat.id, text="Вы красавчик вы угадали !!!")
+        bot.register_next_step_handler(sent, func)
+
+
+# Запускаем бота
+bot.polling(none_stop=True, interval=1)
